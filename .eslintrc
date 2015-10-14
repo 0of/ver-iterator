@@ -6,9 +6,14 @@
         "no-trailing-spaces": [2],
         "space-before-function-paren": [2, "always"]
     },
+    "parser": "babel-eslint",
     "env": {
         "node": true,
-        "mocha": true
+        "mocha": true,
+        "es6": true
+    },
+    "ecmaFeatures": {
+        "modules": true
     },
     "extends": "eslint:recommended"
 }
