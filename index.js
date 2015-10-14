@@ -4,7 +4,7 @@ import child from 'child_process';
 
 export default class VersionIteratable extends EventEmitter{
 
-    constructor(task, {name, versions='*', dir='.'} = {}) {
+    constructor (task, {name, versions='*', dir='.'} = {}) {
         super();
         if (typeof task !== 'function') throw new TypeError('expects task as a function');
 
@@ -20,7 +20,7 @@ export default class VersionIteratable extends EventEmitter{
                 this.emit('fatal', e);
                 return false;
             }
-            
+
             try {
                 task.call(undefined, {name, ver});
             } catch (e) {
@@ -45,7 +45,7 @@ export default class VersionIteratable extends EventEmitter{
     }
 }
 
-const npm = (process.platform === 'win32' ? 'npm.cmd' : 'npm')
+const npm = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
 
 function publishedVers (name) {
     let {stdout, error} = child.spawnSync(npm, ['view', name, 'versions']);
@@ -54,7 +54,7 @@ function publishedVers (name) {
     return stdout.toString().match(/([0|[1-9\d]*\.[0|1-9\d]*\.[0|1-9\d]*)/g) || [];
 }
 
-function installVer(name, ver, dir) {
-    let {error} = child.spawnSync(npm, ['install', `${name}@${ver}`]);
+function installVer (name, ver, dir) {
+    let {error} = child.spawnSync(npm, ['install', `${name}@${ver}`], {cwd: dir});
     if (error) throw error;
 }
