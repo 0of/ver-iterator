@@ -3,7 +3,7 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         eslint: {
             target: {
-                src: ['index.js', 'test/*.js']
+                src: ['index.js', 'src/*.js', 'test/*.js']
             }
         },
         babel: {
