@@ -17,11 +17,23 @@ module.exports = function (grunt) {
                     'lib/ver-iterator.js': './index.js'
                 }
             }
-        }
+        },
+        mochaTest: {
+            test: {
+                options: {
+                    reporter: 'spec',
+                    require: function () {
+                        require('babel/register')({stage: 0});
+                    }
+                },
+                src: ['./test/**/*.js']
+            }
+        },
     });
 
     grunt.registerTask('eslint', 'eslint:target');
     grunt.registerTask('build', ['eslint:target', 'babel:build']);
+    grunt.registerTask('test', ['eslint:target', 'mochaTest:test']);
 
     require('load-grunt-tasks')(grunt);
 };
