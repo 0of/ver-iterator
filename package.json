@@ -27,6 +27,7 @@
     "babel-runtime": "^5.8.25",
     "eslint": "latest",
     "mocha": "latest",
+    "should": "latest",
     "grunt": "latest",
     "grunt-babel": "^5.0.3",
     "grunt-eslint": "^17.1.0",
