@@ -2,7 +2,7 @@ import {satisfies} from 'semver';
 import EventEmitter from 'events';
 import npm from './npm.js';
 
-export default class VersionIterable extends EventEmitter{
+export default class VersionIterable extends EventEmitter {
     /**
      * construct iterable published versions via npm
      *

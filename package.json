@@ -28,6 +28,7 @@
     "eslint": "latest",
     "mocha": "latest",
     "should": "latest",
+    "sinon": "latest",
     "grunt": "latest",
     "grunt-babel": "^5.0.3",
     "grunt-eslint": "^17.1.0",
