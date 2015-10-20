@@ -9,19 +9,18 @@ export default class VersionIterable extends EventEmitter {
      * @param {Function} [task] ({name, version}) => {}
      * @param {Object} [opts]
      * @param {String} [opts.name] package name
-     * @param {String} [opts.versions] iterating versions in semver format
+     * @param {String} [opts.range] iterating version ranges in semver format
      * @param {String} [opts.dir] installing package directory
      * @public
      */
-    constructor (task, {name, versions='*', dir='.'} = {}) {
+    constructor (task, {name, range='*', dir='.'} = {}) {
         super();
         if (typeof task !== 'function') throw new TypeError('expects task as a function');
 
         let allVers = npm.publishedVers(name);
         this.name_ = name;
-        this.vers_ = [
-            for (v of allVers) if (satisfies(v, versions)) v
-        ];
+        this.vers_ = allVers.filter((v) => { return satisfies(v, range); });
+
         this.task_ = (ver) => {
             try {
                 npm.installVer(name, ver, dir);
