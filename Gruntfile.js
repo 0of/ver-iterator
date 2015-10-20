@@ -28,7 +28,7 @@ module.exports = function (grunt) {
                 },
                 src: ['./test/**/*.js']
             }
-        },
+        }
     });
 
     grunt.registerTask('eslint', 'eslint:target');
