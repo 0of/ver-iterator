@@ -13,9 +13,12 @@ module.exports = function (grunt) {
                     stage: 0,
                     optional: ['runtime']
                 },
-                files: {
-                    'lib/ver-iterator.js': './index.js'
-                }
+                files: [{
+                    expand: true,
+                    cwd: './src',
+                    src: ['*.js'],
+                    dest: './lib/'
+                }]
             }
         },
         mochaTest: {
