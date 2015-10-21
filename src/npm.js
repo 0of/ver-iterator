@@ -11,10 +11,10 @@ export default {
      * @public
      */
     publishedVers (name) {
-        let {stdout, error} = child.spawnSync(npmCommand, ['view', name, 'versions']);
+        let {stdout, error} = child.spawnSync(npmCommand, ['view', name, 'versions', '--json']);
         if (error) throw error;
 
-        return stdout.toString().match(/([0|[1-9\d]*\.[0|1-9\d]*\.[0|1-9\d]*)/g) || [];
+        return JSON.parse(stdout.toString());
     },
 
     /**

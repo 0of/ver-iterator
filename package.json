@@ -12,6 +12,7 @@
   },
   "files": [
     "lib",
+    "src",
     "index.js"
   ],
   "keywords": [
@@ -24,7 +25,6 @@
     "babel": "latest",
     "babel-core": "^5.8.24",
     "babel-eslint": "^4.1.3",
-    "babel-runtime": "^5.8.25",
     "eslint": "latest",
     "mocha": "latest",
     "should": "latest",
@@ -36,6 +36,7 @@
     "load-grunt-tasks": "^3.2.0"
   },
   "dependencies": {
+    "babel-runtime": "^5.8.25",
     "semver": "latest"
   }
 }

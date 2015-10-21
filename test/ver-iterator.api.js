@@ -13,8 +13,8 @@ describe('ver-iterator API', () => {
     });
 
     it ('should instantiate iterator successfully', () => {
-        new VersionIterable(() => {}, {name: 'default'});
-        // should(iter).instanceOf(VersionIterable);
+        var iter = new VersionIterable(() => {}, {name: 'default'});
+        should(iter).instanceOf(VersionIterable);
     });
 
     it ('should throw exception when given invalid task function', () => {
