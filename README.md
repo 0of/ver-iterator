@@ -1,5 +1,6 @@
 # ver-iterator
 [![Build status](https://ci.appveyor.com/api/projects/status/5vx1i4h3ny39928a?svg=true)](https://ci.appveyor.com/project/0of/ver-iterator)
+[![npm version](https://badge.fury.io/js/ver-iterator.svg)](https://badge.fury.io/js/ver-iterator)
 
 A task wrapper for dependency version iterations
 
