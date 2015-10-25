@@ -56,7 +56,7 @@ export default {
      * @public
      */
     uninstalledVer (name, ver, dir) {
-        let {error} = child.spawnSync(npmCommand, ['uninstall', `${name}@${ver}`], { cwd: dir });
+        let {error} = child.spawnSync(npmCommand, ['uninstall', ver.length === 0 ? name : `${name}@${ver}`], { cwd: dir });
         if (error) throw error;
     }
 };

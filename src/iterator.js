@@ -56,7 +56,7 @@ export default class VersionIterable extends EventEmitter {
                         // do nothing, ignore it
                     }
                 }
-            }
+            };
         }
     }
 
