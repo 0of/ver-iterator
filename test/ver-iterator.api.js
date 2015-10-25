@@ -8,8 +8,16 @@ import npm from '../src/npm.js';
 import VersionIterable from '../src/iterator.js';
 
 describe('ver-iterator API', () => {
+    var listInstalledVer;
+
+    before(() => {
+        listInstalledVer = npm.listInstalledVer;
+    });
+
     beforeEach(() => {
         npm.installVer = function installVer () {};
+        npm.uninstalledVer = function uninstalledVer () {};
+        npm.listInstalledVer = listInstalledVer;
     });
 
     it ('should instantiate iterator successfully', () => {
@@ -88,7 +96,6 @@ describe('ver-iterator API', () => {
         should(afterEach.callCount).exactly(vers.length);
     });
 
-
     it ('should trigger `failed` event when task function throw an error', () => {
         var vers = ['0.1.0', '0.1.1', '0.2.0', '0.2.1', '0.2.3', '0.3.1'];
         npm.publishedVers = sinon.stub().returns(vers);
@@ -113,6 +120,28 @@ describe('ver-iterator API', () => {
         [...iter];
 
         should(fatal.calledOnce).be.true;
+    });
+
+    it ('should recover to correct version when iterations done', () => {
+        npm.listInstalledVer = sinon.stub().returns('0.1.0');
+        var installSpy = sinon.spy();
+        npm.installVer = installSpy;
+
+        var iter = new VersionIterable(() => {}, {name: 'default', versions: '*' /* iterate all the versions */, restore: true});
+        [...iter];
+
+        should(installSpy.calledOnce).be.true;
+    });
+
+    it ('should remove the installed version when iterations done', () => {
+        npm.listInstalledVer = sinon.stub().returns('');
+        var uninstallSpy = sinon.spy();
+        npm.uninstalledVer = uninstallSpy;
+
+        var iter = new VersionIterable(() => {}, {name: 'default', versions: '*' /* iterate all the versions */, restore: true});
+        [...iter];
+
+        should(uninstallSpy.calledOnce).be.true;
     });
 });
 
