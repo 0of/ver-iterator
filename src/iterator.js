@@ -13,7 +13,7 @@ export default class VersionIterable extends EventEmitter {
      * @param {String} [opts.dir] installing package directory
      * @public
      */
-    constructor (task, {name, range='*', dir='.'} = {}) {
+    constructor (task, {name, range='*', dir='.', restore=true} = {}) {
         super();
         if (typeof task !== 'function') throw new TypeError('expects task as a function');
 
@@ -38,6 +38,26 @@ export default class VersionIterable extends EventEmitter {
 
             return true;
         };
+
+        if (restore) {
+            let preVer = npm.listInstalledVer(name, dir);
+
+            this.restoreAction = () => {
+                // install the previous version of the package
+                if (preVer.length !== 0) {
+                    npm.installVer(name, preVer, dir);
+                } else {
+                    // no record shows any version of the package has been previously installed
+                    // just remove current one
+                    try {
+                        let curVer = npm.listInstalledVer(name, dir);
+                        npm.uninstalledVer(name, curVer, dir);
+                    } catch (e) {
+                        // do nothing, ignore it
+                    }
+                }
+            }
+        }
     }
 
     *[Symbol.iterator] () {
@@ -50,5 +70,10 @@ export default class VersionIterable extends EventEmitter {
         }
 
         this.emit('after');
+
+        // restore
+        if (this.restoreAction) {
+            this.restoreAction();
+        }
     }
 }
