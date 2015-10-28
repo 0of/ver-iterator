@@ -1,5 +1,7 @@
 import {satisfies} from 'semver';
 import EventEmitter from 'events';
+import url from 'url';
+import path from 'path';
 import npm from './npm.js';
 
 export default class VersionIterable extends EventEmitter {
@@ -8,8 +10,9 @@ export default class VersionIterable extends EventEmitter {
      *
      * @param {Function} [task] ({name, version}) => {}
      * @param {Object} [opts]
-     * @param {String} [opts.name] package name
-     * @param {String} [opts.range] iterating version ranges in semver format
+     * @param {String} [opts.name] package name or git URL
+     * @param {String|Function} [opts.range] iterating version ranges in semver format
+     *  or customized version filter
      * @param {String} [opts.dir] installing package directory
      * @public
      */
@@ -17,63 +20,86 @@ export default class VersionIterable extends EventEmitter {
         super();
         if (typeof task !== 'function') throw new TypeError('expects task as a function');
 
-        let allVers = npm.publishedVers(name);
-        this.name_ = name;
-        this.vers_ = allVers.filter((v) => { return satisfies(v, range); });
-
-        this.task_ = (ver) => {
-            try {
-                npm.installVer(name, ver, dir);
-            } catch (e) {
-                this.emit('fatal', e);
-                return false;
-            }
-
-            try {
-                task.call(undefined, {name, version: ver});
-            } catch (e) {
-                this.emit('failed', e);
-                return false;
-            }
-
-            return true;
-        };
-
-        if (restore) {
-            let preVer = npm.listInstalledVer(name, dir);
-
-            this.restoreAction = () => {
-                // install the previous version of the package
-                if (preVer.length !== 0) {
-                    npm.installVer(name, preVer, dir);
-                } else {
-                    // no record shows any version of the package has been previously installed
-                    // just remove current one
-                    try {
-                        let curVer = npm.listInstalledVer(name, dir);
-                        npm.uninstalledVer(name, curVer, dir);
-                    } catch (e) {
-                        // do nothing, ignore it
-                    }
-                }
-            };
+        let versionFilter = typeof range === 'function' ? range : (v) => { return satisfies(v, range); };
+        let {pathname} = url.parse(name);
+        if (path.extname(pathname) == '.git') {
+            // check the name is kind of git repo url
+            name = path.basename(pathname, '.git');
+        } else {
+            this.name = pathname;
+            this.source = makeNPMPackageSource(pathname, versionFilter, dir, restore);
         }
+
+        this.task = task;
+    }
+
+    runEashTask (ver) {
+        try {
+            this.source.switchVersion(ver);
+        } catch (e) {
+            this.emit('fatal', e);
+            return false;
+        }
+
+        try {
+            this.task.call(undefined, { name: this.name, version: ver });
+        } catch (e) {
+            this.emit('failed', e);
+            return false;
+        }
+
+        return true;
     }
 
     *[Symbol.iterator] () {
+        let vers = this.source.fetchVersions();
+
         this.emit('before');
 
-        for (let ver of this.vers_) {
+        for (let ver of vers) {
             this.emit('beforeEach', ver);
-            yield this.task_(ver);
+            yield this.runEashTask(ver);
             this.emit('afterEach', ver);
         }
 
         this.emit('after');
 
         // restore
-        if (this.restoreAction) {
-            this.restoreAction();
+        if (this.source.restore) {
+            this.source.restore();
         }
     }
+}
+
+function makeNPMPackageSource (name, versionFilter, dir, willRestore) {
+    var packageSource = {
+        fetchVersions () {
+            return npm.publishedVers(name).filter(versionFilter);
+        },
+
+        switchVersion (ver) {
+            npm.installVer(name, ver, dir);
+        }
+    };
+
+    if (willRestore) {
+        let preVer = npm.listInstalledVer(name, dir);
+        packageSource.restore = () => {
+            // install the previous version of the package
+            if (preVer.length !== 0) {
+                npm.installVer(name, preVer, dir);
+            } else {
+                // no record shows any version of the package has been previously installed
+                // just remove current one
+                try {
+                    let curVer = npm.listInstalledVer(name, dir);
+                    npm.uninstalledVer(name, curVer, dir);
+                } catch (e) {
+                    // do nothing, ignore it
+                }
+            }
+        };
+    }
+
+    return packageSource;
 }
