@@ -2,7 +2,9 @@ import {satisfies} from 'semver';
 import EventEmitter from 'events';
 import url from 'url';
 import path from 'path';
+import fs from 'fs';
 import npm from './npm.js';
+import git from './git.js';
 
 export default class VersionIterable extends EventEmitter {
     /**
@@ -24,10 +26,14 @@ export default class VersionIterable extends EventEmitter {
         let {pathname} = url.parse(name);
         if (path.extname(pathname) == '.git') {
             // check the name is kind of git repo url
-            name = path.basename(pathname, '.git');
+            let repoName = path.basename(pathname, '.git');
+            this.name = repoName;
+            this.source = makeGitSource(repoName, name /* passing url */, versionFilter, dir, restore);
+            this.sourceName = 'git';
         } else {
             this.name = pathname;
             this.source = makeNPMPackageSource(pathname, versionFilter, dir, restore);
+            this.sourceName = 'npm';
         }
 
         this.task = task;
@@ -102,4 +108,25 @@ function makeNPMPackageSource (name, versionFilter, dir, willRestore) {
     }
 
     return packageSource;
+}
+
+function makeGitSource (name, url, versionFilter, dir, willRestore) {
+    var clonedDir = path.join(dir, name);
+
+    var gitSource = {
+        fetchVersions () {
+            git.clone(url, dir);
+            return git.listTags(clonedDir).filter(versionFilter);
+        },
+
+        switchVersion (ver) {
+            git.checkout(ver, clonedDir);
+        }
+    };
+
+    if (willRestore) {
+        gitSource.restore = () => {
+            fs.rmdirSync(clonedDir);
+        };
+    }
 }

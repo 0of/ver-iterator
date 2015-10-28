@@ -31,6 +31,11 @@ describe('ver-iterator API', () => {
         }).throw();
     });
 
+    it ('should have a source name `npm`', () => {
+        var iter = new VersionIterable(() => {}, {name: 'default'});
+        should(iter.sourceName).eql('npm');
+    });
+
     it ('should iterate over the versions successfully', () => {
         npm.publishedVers = sinon.stub().returns(['0.1.0', '0.1.1', '0.2.0', '0.2.1', '0.2.3', '0.3.1']);
         var task = sinon.spy();
