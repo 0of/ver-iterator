@@ -126,7 +126,13 @@ function makeGitSource (name, url, versionFilter, dir, willRestore) {
 
     if (willRestore) {
         gitSource.restore = () => {
-            fs.rmdirSync(clonedDir);
+            try {
+                fs.rmdirSync(clonedDir);
+            } catch (e) {
+                // no throw
+            }
         };
     }
+
+    return gitSource;
 }
