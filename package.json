@@ -1,6 +1,6 @@
 {
   "name": "ver-iterator",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A task wrapper for dependency version iterations",
   "author": "0of",
   "license": "MIT",
