@@ -40,16 +40,23 @@ for (let eachResult of iter) {
 # Constructor Options
  - **<u>name</u>**: { _String_ }
 
-  published package name
+  published package name or git URL
+  > if passing git URL as name option, when running ver-iterator will clone the repo automatically and list all the tags as released versions
   
- - **<u>range</u>**: { _String_ }
+ - **<u>range</u>**: { _String_ | _Function_ }
   
-  iterating version ranges in semver(https://github.com/npm/node-semver) format
+  iterating version ranges in semver(https://github.com/npm/node-semver) format. Besides passing customized version filter is allowed
 
  - **<u>dir</u>**: { _String_ }  
 
   package installing directory
 
+# Properties of VersionIterable
+- **<u>name</u>**: { _String_ }
+
+name of the package or git repo
+
+- **<u>sourceName</u>**: { _String_ } {`"npm"` | `"git"`}
 
 # License
   MIT License
