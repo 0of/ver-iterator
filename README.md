@@ -51,7 +51,7 @@ for (let eachResult of iter) {
 
   package installing directory
 
-# Properties of VersionIterable
+# Properties
 - **<u>name</u>**: { _String_ }
 
 name of the package or git repo
